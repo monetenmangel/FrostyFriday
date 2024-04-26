@@ -1,0 +1,30 @@
+// Creating a CSV file format
+CREATE OR REPLACE FILE FORMAT csvformat
+    type = 'CSV'
+    field_delimiter = ','
+    skip_header = 1;
+
+// Creating a Stage Object to reference data files stored in a s3 bucket
+CREATE OR REPLACE STAGE ch1_csv_stage
+    file_format = csvformat
+    url = 's3://frostyfridaychallenges/challenge_1/';
+// List objects in stage
+LIST @ch1_csv_stage
+;
+
+// Checking the CSV in stage
+SELECT $1,$2
+FROM @ch1_csv_stage (file_format => csvformat);
+
+// Creating a table and table schema  
+CREATE OR REPLACE TABLE "TIL_PORTFOLIO_PROJECTS"."BENM_SCHEMA"."challenge1_table"
+  (C1 VARCHAR);
+
+// Load the csv data into a table in my schema
+copy into "TIL_PORTFOLIO_PROJECTS"."BENM_SCHEMA"."challenge1_table"
+from @ch1_csv_stage;
+
+//test
+select * from "challenge1_table";
+
+// heavily inspired by https://theinformationlab.nl/2022/08/18/frosty-friday-developing-snowflake-skills/
